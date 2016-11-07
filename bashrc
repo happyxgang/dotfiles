@@ -138,3 +138,5 @@ if [ -f ~/.git-completion.bash ]; then
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+alias tmux="TERM=screen-256color-bce tmux"
+
