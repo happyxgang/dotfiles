@@ -1,15 +1,19 @@
 # Darwin Specific Shit
 
+# Homebrew Bash Completion
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+fi
+
 # Default Mac Web Server
 export DOCROOT=/Library/WebServer/Documents
 
-dropbox-ctl() {
+dropbox() {
   open "http://dl.dropbox.com/u/56340597/$1"
 }
-alias dropbox=dropbox-ctl
-alias jsonpp=/usr/local/Cellar/jsonpp/86.64/bin/jsonpp
 
-mvim-ctl() {
-  /opt/local/bin/mvim $1 >/dev/null 2>&1
+irc() {
+  killall -9 bitlbee >/dev/null 2>&1
+  bitlbee -D
+  irssi
 }
-alias mvim=mvim-ctl

@@ -14,37 +14,39 @@ set -o vi
 
 export EDITOR=vim
 
-# MacPorts Bash Completion
-if [ -f /opt/local/etc/bash_completion ]; then
-  . /opt/local/etc/bash_completion
-fi
-
 #bind "set completion-ignore-case on"
 shopt -s cdspell
 shopt -s checkwinsize
 
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    test -r $HOME/.dircolors && eval "$(dircolors -b $HOME/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
 
-alias vi='vim'
-alias v='vim'
+function ovim {
+  /usr/local/bin/vim
+}
+alias vim='e'
+alias vi='e'
+alias v='e'
 alias l='ls -alh'
 alias la='ls -alh'
 alias lt='ls -alrth'
-alias g='git'
 alias h='history |grep'
 alias b='cat ~/.bashrc |grep'
 
-export GOPATH=~/.go
+# i fucking hate godep
+export GOPATH=$HOME/code/go
 
-export SCALA_HOME=/usr/local/scala
+export ECLIPSE_HOME=$HOME/eclipse/jee-neon/Eclipse.app/Contents/Eclipse
 
-export PATH=${PATH}:~/bin:/usr/local/go/bin:${SCALA_HOME}/bin:${GOPATH}/bin
+export PATH=$HOME/bin:${PATH}:/usr/local/go/bin:${SCALA_HOME}/bin:${GOPATH}/bin:/usr/local/sbin:${ECLIPSE_HOME}
+
+# proper ctags man
+export MANPATH=$HOME/bin/ctags-root/share/man:$MANPATH
 
 # Colorized Prompt
 BLACK="\[\033[0;30m\]"
@@ -66,7 +68,7 @@ WHITE="\[\033[1;37m\]"
 NOCOLOR="\[\033[0m\]"
 
 function cool_prompt {
-  PS1="$BLUE[\t] \u@\h "
+PS1="$BLUE[\t] \u@$(if [[ -x /usr/local/bin/my-instance-name ]]; then echo "$RED$(/usr/local/bin/my-instance-name)$BLUE"; elif [[ -f ~/.homed ]]; then echo "$RED$(hostname -s)$BLUE"; else hostname -s; fi) "
   [[ $(type -t __git_ps1) = "function" ]] && PS1="${PS1}$(__git_ps1 '%s:')"
   PS1="${PS1}\W \!$ $NOCOLOR"
 }
@@ -74,14 +76,65 @@ function cool_prompt {
 PROMPT_COMMAND=cool_prompt
 
 # z!
-. ~/bin/z.sh
+. $HOME/bin/z.sh
 
 # Expected working dir for code
-export CODE=~/code
+export CODE=$HOME/code
 alias cdcode='z $CODE'
 alias cdslate='z $CODE/slate'
 alias zcode='z $CODE'
 alias zslate='z $CODE/slate'
 
+# Other Aliases
+alias svim='sudo vim'
+alias rmswap='rm ~/.vim/tmp/swap/*'
+
+# AWS Aliases
+alias adil='aws describe-instances'
+function adi-ctl {
+  adil $@ |awk -F "|" '{ print $2 " " $6 " " $9 " " $12 " " $13; }'
+}
+alias adi='adi-ctl'
+function adia-ctl {
+  adil $@ --region ap-northeast-1 |awk -F "|" '{ print $2 " " $6 " " $9 " " $12 " " $13; }'
+}
+alias adia='adia-ctl'
+function adie-ctl {
+  adil $@ --region eu-west-1 |awk -F "|" '{ print $2 " " $6 " " $9 " " $12 " " $13; }'
+}
+alias adie='adie-ctl'
+alias adg='aws describe-groups'
+
+# Pt > Ag > Ack
+alias ack=pt
+
+# hub > git
+[ ! $(which hub) == "" ] && eval "$(hub alias -s)"
+alias g='git'
+alias gbranch='git rev-parse --abbrev-ref HEAD'
+function gclone {
+  git clone ssh://git@github.com/$1
+}
+
+# Chruby
+if [ -f /usr/local/share/chruby/chruby.sh ]; then
+  source /usr/local/share/chruby/chruby.sh
+  chruby 2.3.1
+fi
+
+# The Fuck
+eval "$(thefuck --alias)"
+
 [[ -s "$HOME/.bashrc.`uname`" ]] && source "$HOME/.bashrc.`uname`"
-[[ -s "$HOME/.bashrc.ooyala" ]] && source "$HOME/.bashrc.ooyala"
+[[ -s "$HOME/.bashrc.netflix" ]] && source "$HOME/.bashrc.netflix"
+[[ -s "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"
+
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+  . $(brew --prefix)/etc/bash_completion
+fi
+
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

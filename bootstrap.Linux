@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPTDIR=$(cd `dirname $0` && pwd)
+
+#sudo apt-get-repository ppa:keithw/mosh
+sudo apt-get update
+#sudo apt-get install -y mosh
+sudo apt-get install -y perl curl wget ctags screen ngrep silversearcher-ag
+
+# Create Links
+cd ~
+[[ ! -L .screenrc ]] && ln -s $SCRIPTDIR/screenrc .screenrc
